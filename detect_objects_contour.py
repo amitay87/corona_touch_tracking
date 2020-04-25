@@ -1,5 +1,6 @@
 import time
 import winsound
+import datetime
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,29 +11,28 @@ import cvlib as cv
 
 def intersects(box1, box2):
     print("AAA in intersects")
-    print(f"AAA box1: {box1}")
-    print(f"AAA box2: {box2}")
-    # return (box1[0]<box2[0]<box1[2] and box1[1]<box2[1]<box1[3]) or () or() or ()
+
     if (box1[2] < box2[0]):
-        print("AAA box1[2] < box2[0]. returning False")
         return False
     elif box1[0] > box2[2]:
-        print("AAA box1[0] > box2[2]. returning False")
         return False
     elif box1[1] > box2[3]:
-        print("AAA box1[1] > box2[3]. returning False")
         return False
     elif box1[3] < box2[1]:
-        print("AAA box1[3] < box2[1]. returning False")
         return False
 
-    print("AAA returning True")
     return True
 
 
 cap = cv2.VideoCapture(0)
+frame_counter = 1
+
+static_objects = ['apple', 'banana', 'laptop', 'keyboard']
+
+touches = []
 
 while True:
+
     _, image = cap.read()
     # convert to grayscale
     # grayscale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -49,34 +49,42 @@ while True:
     #         cv2.line(edges, (x1, y1), (x2, y2), (255, 0, 0), 3)
 
 
-    bbox, label, conf = cv.detect_common_objects(image)
-    print(f"bbox, label, conf: {bbox}, {label}, {conf}")
-    output_image = draw_bbox(image, bbox, label, conf)
+    bbox, labels, conf = cv.detect_common_objects(image)
+    print(f"bbox, label, conf: {bbox}, {labels}, {conf}")
+    output_image = draw_bbox(image, bbox, labels, conf)
 
     green = (0,255,0)
     yellow = (0,255,255)
     orange = (51, 153, 255)
     red = (0,0,255)
 
-    if 'person' in label:
+
+
+    if 'person' in labels:
         color = yellow
-        if len('label') > 1 and 'apple' in label:
-            person_index = label.index('person')
-            apple_index = label.index('apple')
-            if intersects(bbox[person_index], bbox[apple_index]):
-                print("AAA in if instersects")
-                color = red # orange
+        detected_stat_objs = [so for so in static_objects if so in labels]
+        if len('label') > 1 and len(detected_stat_objs) >= 1: # 'apple' in label:
+            person_index = labels.index('person')
 
-                frequency = 2500  # Set Frequency To 2500 Hertz
-                duration = 1000  # Set Duration To 1000 ms == 1 second
-                winsound.Beep(frequency, duration)
-                print(f"AAA image before: {image}")
-                # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                # for row in image:
-                #     for idx, pixel in enumerate(row):
-                #         row[idx] = [0, 0, pixel]
+            for stat_obj in detected_stat_objs:
+                # apple_index = labels.index('apple')
+                stat_obj_idx = labels.index(stat_obj)
+                if intersects(bbox[person_index], bbox[stat_obj_idx]):
+                    touches.append({'time':datetime.datetime.now(), 'object': stat_obj})
+                    print(f"AAA in if instersects. stat_obj: {stat_obj}")
+                    print(f"AAA touches: {touches}")
+                    color = red # orange
 
-                print(f"AAA image: {image}")
+                    frequency = 2500  # Set Frequency To 2500 Hertz
+                    duration = 1000  # Set Duration To 1000 ms == 1 second
+                    winsound.Beep(frequency, duration)
+                    # print(f"AAA image before: {image}")
+                    # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                    # for row in image:
+                    #     for idx, pixel in enumerate(row):
+                    #         row[idx] = [0, 0, pixel]
+
+                    # print(f"AAA image: {image}")
     else:
         color = green
 
@@ -85,6 +93,8 @@ while True:
 
     # show images
     cv2.imshow("image", image)
+    # cv2.imwrite(f"capt_image_{frame_counter}.jpg", image)
+    frame_counter += 1
     # cv2.imshow("edges", edges)
     # time.sleep(1)
     if cv2.waitKey(1) == ord("q"):
