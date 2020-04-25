@@ -10,7 +10,7 @@ import cvlib as cv
 
 
 def intersects(box1, box2):
-    print("AAA in intersects")
+    # print("AAA in intersects")
 
     if (box1[2] < box2[0]):
         return False
@@ -50,7 +50,7 @@ while True:
 
 
     bbox, labels, conf = cv.detect_common_objects(image)
-    print(f"bbox, label, conf: {bbox}, {labels}, {conf}")
+    # print(f"bbox, label, conf: {bbox}, {labels}, {conf}")
     output_image = draw_bbox(image, bbox, labels, conf)
 
     green = (0,255,0)
@@ -73,20 +73,22 @@ while True:
                     touches.append({'time':datetime.datetime.now(), 'object': stat_obj})
                     if len(touches)  % 10 == 0:
                         touch_counter = dict()
-
+                        print("\n\n====================================================================\n")
                         print("based on the 10 last touches, the priorioization order should be:")
                         for touch in touches[-10:]:
                             touch_counter[touch['object']] = touch_counter.get(touch['object'], 0) + 1
 
-                        print(f"AAA touch counter: {touch_counter}")
+                        # print(f"AAA touch counter: {touch_counter}")
 
                         sorted_tc = {k: v for k, v in sorted(touch_counter.items(), key=lambda item: item[1], reverse=True)}
-                        print(f"AAA sorted touch counter: {sorted_tc}")
+                        # print(f"AAA sorted touch counter: {sorted_tc}")
                         for obj, count in sorted_tc.items():
                             print(f"{obj}: touched: {count} times. it is recommended to clean it in every {120/count} minutes")
 
-                    print(f"AAA in if instersects. stat_obj: {stat_obj}")
-                    print(f"AAA touches: {touches}")
+                        print("\n========================================================================\n\n")
+
+                    print(f"{datetime.datetime.now()}: touch detected: human touched {stat_obj}")
+                    # print(f"AAA touches: {touches}")
                     color = red # orange
 
                     frequency = 2500  # Set Frequency To 2500 Hertz
