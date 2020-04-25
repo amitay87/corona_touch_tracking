@@ -2,3 +2,7 @@
 A system that will track touch in common surfaces in order to prioriotize the cleaning/disinfection of the most touched surfaces
 
 ![](example_demo_lite.gif)
+
+## manual
+type `python detect_objects_countour.py` in command line 
+(you have to make sure all the libraries are installed properly, including cvlib and cv2, you might want to use `anaconda`)
