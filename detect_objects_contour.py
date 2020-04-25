@@ -71,13 +71,27 @@ while True:
                 stat_obj_idx = labels.index(stat_obj)
                 if intersects(bbox[person_index], bbox[stat_obj_idx]):
                     touches.append({'time':datetime.datetime.now(), 'object': stat_obj})
+                    if len(touches)  % 10 == 0:
+                        touch_counter = dict()
+
+                        print("based on the 10 last touches, the priorioization order should be:")
+                        for touch in touches[-10:]:
+                            touch_counter[touch['object']] = touch_counter.get(touch['object'], 0) + 1
+
+                        print(f"AAA touch counter: {touch_counter}")
+
+                        sorted_tc = {k: v for k, v in sorted(touch_counter.items(), key=lambda item: item[1], reverse=True)}
+                        print(f"AAA sorted touch counter: {sorted_tc}")
+                        for obj, count in sorted_tc.items():
+                            print(f"{obj}: touched: {count} times. it is recommended to clean it in every {120/count} minutes")
+
                     print(f"AAA in if instersects. stat_obj: {stat_obj}")
                     print(f"AAA touches: {touches}")
                     color = red # orange
 
                     frequency = 2500  # Set Frequency To 2500 Hertz
                     duration = 1000  # Set Duration To 1000 ms == 1 second
-                    winsound.Beep(frequency, duration)
+                    winsound.Beep(frequency, duration) # this command also probably helps preventing logging single touch as many
                     # print(f"AAA image before: {image}")
                     # image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                     # for row in image:
